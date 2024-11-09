@@ -32,7 +32,7 @@ const loginUser = async (req,res) =>{
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email,type ,password } = req.body
+        const { name, email, password } = req.body
 
         const exists = await userModel.findOne({ email })
         if (exists) {
@@ -51,7 +51,6 @@ const registerUser = async (req, res) => {
         const newUser = new userModel({
             name,
             email,
-            type,
             password: hashedPassword
         })
         const user = await newUser.save()
@@ -65,6 +64,21 @@ const registerUser = async (req, res) => {
 }
 
 
+const adminLogin = async (req,res) =>{
+    try{
+        const {email,password} = req.body
+        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD){
+            const token = jwt.sign(email+password,process.env.JWT_SECRET)
+            res.json({success:true,token})
+        }else{
+            res.json({success:false,message:"Invalid Credentaials"})
+        }
+    }catch(error){
+        console.log(error)
+        res.json({ success: false, message: "Server error, please try again later." })
+    }
+}
 
-export { loginUser, registerUser }
+
+export { adminLogin, loginUser, registerUser }
 
